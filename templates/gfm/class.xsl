@@ -17,73 +17,63 @@
     <xsl:param name="title" select="'Classes'" />
 
     <xsl:template match="/">
-        <html lang="en">
-            <xsl:call-template name="head">
-                <xsl:with-param name="title" select="$unit/@full" />
+       <xsl:call-template name="nav" />
+       <a name="mainstage"></a>
+            <xsl:call-template name="breadcrumb" />
+            <xsl:call-template name="sidenav" />
+            <a name="introduction"></a>
+            # <xsl:value-of select="$unit/@namespace" />\<xsl:value-of select="$unit/@name" />
+            #### <xsl:value-of select="$unit/pdx:docblock/pdx:description/@compact" />
+            <xsl:copy-of select="pdxf:nl2br($unit/pdx:docblock/pdx:description)" />
+            <xsl:if test="$unit/pdx:docblock"><xsl:call-template name="docblock" /></xsl:if>
+
+            <a name="synopsis"></a>
+            ## Synopsis
+            <xsl:call-template name="synopsis">
+                <xsl:with-param name="unit" select="$unit" />
             </xsl:call-template>
-            <body>
-                <xsl:call-template name="nav" />
-                <div id="mainstage">
-                    <xsl:call-template name="breadcrumb" />
-                    <xsl:call-template name="sidenav" />
-                    <section>
-                        <h1 id="introduction"><small><xsl:value-of select="$unit/@namespace" />\</small><xsl:value-of select="$unit/@name" /></h1>
-                        <h4><xsl:value-of select="$unit/pdx:docblock/pdx:description/@compact" /></h4>
-                        <p><xsl:copy-of select="pdxf:nl2br($unit/pdx:docblock/pdx:description)" /></p>
-                        <xsl:if test="$unit/pdx:docblock">
-                        <xsl:call-template name="docblock" />
-                        </xsl:if>
 
-                        <h2 id="synopsis">Synopsis</h2>
-                        <xsl:call-template name="synopsis">
-                            <xsl:with-param name="unit" select="$unit" />
-                        </xsl:call-template>
+            <xsl:if test="$unit/pdx:extends|$unit/pdx:extender|$unit/pdx:implements|$unit/pdx:uses">
+            ## <a name="hierarchy"></a> Hierarchy
+            <xsl:call-template name="hierarchy" />
+            </xsl:if>
 
-                        <xsl:if test="$unit/pdx:extends|$unit/pdx:extender|$unit/pdx:implements|$unit/pdx:uses">
-                        <h2 id="hierarchy">Hierarchy</h2>
-                        <xsl:call-template name="hierarchy" />
-                        </xsl:if>
+            <xsl:if test="$unit//pdx:enrichment[@type = 'phpunit']">
+            ## <a name="coverage"></a> Coverage
+            <xsl:call-template name="coverage" />
+            </xsl:if>
 
-                        <xsl:if test="$unit//pdx:enrichment[@type = 'phpunit']">
-                        <h2 id="coverage">Coverage</h2>
-                        <xsl:call-template name="coverage" />
-                        </xsl:if>
+            <xsl:if test="$unit//pdx:enrichment[@type='pmd' or @type='checkstyle']">
+            <xsl:call-template name="violations">
+                <xsl:with-param name="ctx" select="$unit//pdx:enrichments" />
+            </xsl:call-template>
+            </xsl:if>
 
-                        <xsl:if test="$unit//pdx:enrichment[@type='pmd' or @type='checkstyle']">
-                        <xsl:call-template name="violations">
-                            <xsl:with-param name="ctx" select="$unit//pdx:enrichments" />
-                        </xsl:call-template>
-                        </xsl:if>
+            <xsl:if test="//pdx:todo">
+            ## <a name="tasks"></a> Tasks
+            <xsl:call-template name="tasks" />
+            </xsl:if>
 
-                        <xsl:if test="//pdx:todo">
-                        <h2 id="tasks">Tasks</h2>
-                        <xsl:call-template name="tasks" />
-                        </xsl:if>
+            <xsl:if test="//pdx:constant">
+            ## <a name="constants"></a> Constants
+            <xsl:call-template name="constants" />
+            </xsl:if>
 
-                        <xsl:if test="//pdx:constant">
-                        <h2 id="constants">Constants</h2>
-                        <xsl:call-template name="constants" />
-                        </xsl:if>
+            <xsl:if test="//pdx:member">
+            ## <a name="members"></a> Members
+            <xsl:call-template name="members" />
+            </xsl:if>
 
-                        <xsl:if test="//pdx:member">
-                        <h2 id="members">Members</h2>
-                        <xsl:call-template name="members" />
-                        </xsl:if>
+            <xsl:if test="//pdx:method">
+            ## <a name="methods"></a> Methods
+            <xsl:call-template name="methods" />
+            </xsl:if>
 
-                        <xsl:if test="//pdx:method">
-                        <h2 id="methods">Methods</h2>
-                        <xsl:call-template name="methods" />
-                        </xsl:if>
-
-                        <xsl:if test="//pdx:enrichment[@type = 'git']">
-                            <h2 id="history">History</h2>
-                            <xsl:call-template name="git-history" />
-                        </xsl:if>
-                    </section>
-                </div>
-                <xsl:call-template name="footer" />
-            </body>
-        </html>
+            <xsl:if test="//pdx:enrichment[@type = 'git']">
+                ## <a name="history"></a> History
+                <xsl:call-template name="git-history" />
+            </xsl:if>
+        <xsl:call-template name="footer" />
     </xsl:template>
 
     <!-- ######################################################################################################### -->

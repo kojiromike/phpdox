@@ -31,9 +31,7 @@
     <!-- ######################################################################################################### -->
 
     <xsl:template name="footer">
-        <footer>
-            <span><xsl:value-of select="//pdx:enrichment[@type = 'build']/pdx:phpdox/@generated" /></span>
-        </footer>
+        <xsl:value-of select="//pdx:enrichment[@type = 'build']/pdx:phpdox/@generated" />
     </xsl:template>
 
     <!-- ######################################################################################################### -->
@@ -42,17 +40,15 @@
         <xsl:param name="ctx" select="$unit" />
 
         <xsl:for-each select="$ctx/pdx:docblock">
-            <ul>
-                <xsl:if test="pdx:author">
-                    <li>Author: <xsl:value-of select="pdx:author/@value" /></li>
-                </xsl:if>
-                <xsl:if test="pdx:copyright">
-                    <li>Copyright: <xsl:value-of select="pdx:copyright/@value" /></li>
-                </xsl:if>
-                <xsl:if test="pdx:license">
-                    <li>License: <xsl:value-of select="pdx:license/@name" /></li>
-                </xsl:if>
-            </ul>
+            <xsl:if test="pdx:author">
+                * Author: <xsl:value-of select="pdx:author/@value" />
+            </xsl:if>
+            <xsl:if test="pdx:copyright">
+                * Copyright: <xsl:value-of select="pdx:copyright/@value" />
+            </xsl:if>
+            <xsl:if test="pdx:license">
+                * License: <xsl:value-of select="pdx:license/@name" />
+            </xsl:if>
         </xsl:for-each>
     </xsl:template>
 
@@ -60,49 +56,36 @@
 
     <xsl:template name="hierarchy">
         <xsl:param name="dir" select="'classes'" />
-
-        <div class="styled">
-            <xsl:if test="$unit/pdx:extends">
-                <h4>Extends</h4>
-                <ul>
-                    <xsl:for-each select="$unit/pdx:extends">
-                        <li><a href="{$base}{$dir}/{translate(@full, '\', '_')}.{$extension}"><xsl:value-of select="@full" /></a></li>
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:extender">
-                <h4>Extended by</h4>
-                <ul>
-                    <xsl:for-each select="$unit/pdx:extender">
-                        <li><a href="{$base}{$dir}/{translate(@full, '\', '_')}.{$extension}"><xsl:value-of select="@full" /></a></li>
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:uses">
-                <h4>Uses</h4>
-                <ul>
-                    <xsl:for-each select="$unit/pdx:uses">
-                        <li><a href="{$base}traits/{translate(@full, '\', '_')}.{$extension}"><xsl:value-of select="@full" /></a></li>
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:implements">
-                <h4>Implements</h4>
-                <ul>
-                    <xsl:for-each select="$unit/pdx:implements">
-                        <li><a href="{$base}interfaces/{translate(@full, '\', '_')}.{$extension}"><xsl:value-of select="@full" /></a></li>
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:implementor">
-                <h4>Implemented by</h4>
-                <ul>
-                    <xsl:for-each select="$unit/pdx:implementor">
-                        <li><a href="{$base}classes/{translate(@full, '\', '_')}.{$extension}"><xsl:value-of select="@full" /></a></li>
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-        </div>
+        <xsl:if test="$unit/pdx:extends">
+            #### Extends
+            <xsl:for-each select="$unit/pdx:extends">
+                * [<xsl:value-of select="@full" />]({$base}{$dir}/{translate(@full, '\', '_')}.{$extension})
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:extender">
+            #### Extended by
+            <xsl:for-each select="$unit/pdx:extender">
+                * [<xsl:value-of select="@full" />]({$base}{$dir}/{translate(@full, '\', '_')}.{$extension})
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:uses">
+            #### Uses
+            <xsl:for-each select="$unit/pdx:uses">
+                * [<xsl:value-of select="@full" />]({$base}traits/{translate(@full, '\', '_')}.{$extension})
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:implements">
+            #### Implements
+            <xsl:for-each select="$unit/pdx:implements">
+                * [<xsl:value-of select="@full" />]({$base}interfaces/{translate(@full, '\', '_')}.{$extension})
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:implementor">
+            #### Implemented by
+            <xsl:for-each select="$unit/pdx:implementor">
+                * [<xsl:value-of select="@full" />]({$base}classes/{translate(@full, '\', '_')}.{$extension})
+            </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
@@ -111,56 +94,26 @@
         <xsl:param name="ctx" />
 
         <xsl:if test="$ctx/pdx:enrichment[@type='pmd' or @type='checkstyle']">
-        <h2 id="violations">Violations</h2>
-        <div class="styled">
+            <a name="violations"></a>
+            ## Violations
             <xsl:if test="$ctx/pdx:enrichment[@type='pmd']">
-                <h3>PHPMessDetector</h3>
-                <table class="styled">
-                    <thead>
-                        <tr>
-                            <th>Line</th>
-                            <th>Rule</th>
-                            <th>Message</th>
-                        </tr>
-                    </thead>
-                    <xsl:for-each select="$ctx/pdx:enrichment[@type='pmd']/pdx:violation">
-                        <xsl:sort data-type="number" select="@beginline" order="ascending" />
-                        <tr>
-                            <td>
-                                <xsl:choose>
-                                    <xsl:when test="@beginline = @endline"><xsl:value-of select="@beginline" /></xsl:when>
-                                    <xsl:otherwise><xsl:value-of select="@beginline" /> - <xsl:value-of select="@endline" /></xsl:otherwise>
-                                </xsl:choose>
-                            </td>
-                            <td><a href="{@externalInfoUrl}" target="_blank" title="{@ruleset}"><xsl:value-of select="@rule" /></a></td>
-                            <td><xsl:value-of select="@message" /></td>
-                        </tr>
-                    </xsl:for-each>
-                </table>
+                ### PHPMessDetector
+                | Line | Rule | Message |
+                | ---- | ---- | ------- |
+                <xsl:for-each select="$ctx/pdx:enrichment[@type='pmd']/pdx:violation">
+                    <xsl:sort data-type="number" select="@beginline" order="ascending" />
+                    | <xsl:choose> <xsl:when test="@beginline = @endline"><xsl:value-of select="@beginline" /></xsl:when> <xsl:otherwise><xsl:value-of select="@beginline" /> - <xsl:value-of select="@endline" /></xsl:otherwise> </xsl:choose> | <a href="{@externalInfoUrl}" target="_blank" title="{@ruleset}"><xsl:value-of select="@rule" /> | <xsl:value-of select="@message" /> |
+                </xsl:for-each>
             </xsl:if>
             <xsl:if test="$ctx/pdx:enrichment[@type='checkstyle']">
-                <h3>Checkstyle</h3>
-                <table class="styled">
-                    <thead>
-                        <tr>
-                            <th>Line</th>
-                            <th>Column</th>
-                            <th>Severity</th>
-                            <th>Message</th>
-                        </tr>
-                    </thead>
-                    <xsl:for-each select="$ctx/pdx:enrichment[@type='checkstyle']/pdx:*">
-                        <xsl:sort data-type="number" select="@line" order="ascending" />
-                        <tr>
-                            <td><xsl:value-of select="@line" /></td>
-                            <td><xsl:value-of select="@column" /></td>
-                            <td><span title="{@source}"><xsl:value-of select="local-name(.)" /></span></td>
-                            <td><xsl:value-of select="@message" /></td>
-                        </tr>
-                    </xsl:for-each>
-                </table>
+                ### Checkstyle
+                | Line | Column | Severity | Message |
+                | ---- | ------ | -------- | ------- |
+                <xsl:for-each select="$ctx/pdx:enrichment[@type='checkstyle']/pdx:*">
+                    <xsl:sort data-type="number" select="@line" order="ascending" />
+                    | <xsl:value-of select="@line" /> | <xsl:value-of select="@column" /> | <span title="{@source}"><xsl:value-of select="local-name(.)" /></span> | <xsl:value-of select="@message" /> |
+                </xsl:for-each>
             </xsl:if>
-        </div>
         </xsl:if>
     </xsl:template>
 
@@ -169,140 +122,103 @@
     <xsl:template name="tasks">
         <xsl:param name="ctx" select="$unit" />
 
-        <h2 id="tasks">Tasks</h2>
-        <table class="styled">
-            <thead>
-                <tr>
-                    <th style="width:3em;">Line</th>
-                    <th>Task</th>
-                </tr>
-            </thead>
-            <xsl:for-each select="$ctx//pdx:todo">
-                <xsl:variable name="line">
-                    <xsl:choose>
-                        <xsl:when test="@line"><xsl:value-of select="@line" /></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="../../@start" />+</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
-                <tr>
-                    <td class="nummeric"><xsl:value-of select="$line" /></td>
-                    <td><xsl:value-of select="@value" /></td>
-                </tr>
-            </xsl:for-each>
-        </table>
+        <a name="tasks"></a>
+        ## Tasks
+        | Line | Task |
+        | ---- | ---- |
+        <xsl:for-each select="$ctx//pdx:todo">
+            <xsl:variable name="line">
+                <xsl:choose>
+                    <xsl:when test="@line"><xsl:value-of select="@line" /></xsl:when>
+                    <xsl:otherwise><xsl:value-of select="../../@start" />+</xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            | <xsl:value-of select="$line" /> | <xsl:value-of select="@value" /> |
+        </xsl:for-each>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
 
     <xsl:template name="constants">
-        <table class="styled">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <xsl:for-each select="//pdx:constant">
-                    <tr>
-                        <td id="{@name}"><xsl:value-of select="@name" /></td>
-                        <td><xsl:value-of select="@value" /></td>
-                    </tr>
-                </xsl:for-each>
-            </tbody>
-        </table>
+        | Name | Value |
+        | ---- | ----- |
+        <xsl:for-each select="//pdx:constant">
+            | <a name="{@name}"></a><xsl:value-of select="@name" /> | <xsl:value-of select="@value" /> |
+        </xsl:for-each>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
 
     <xsl:template name="members">
-        <div class="styled members">
-            <xsl:if test="//pdx:member[@visibility='private']">
-                <h4>private</h4>
-                <ul class="members">
-                    <xsl:for-each select="//pdx:member[@visibility='private']">
-                        <xsl:sort select="@name" />
-                        <xsl:call-template name="memberli" />
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="//pdx:member[@visibility='protected']">
-                <h4>protected</h4>
-                <ul class="members">
-                    <xsl:for-each select="//pdx:member[@visibility='protected']">
-                        <xsl:sort select="@name" />
-                        <xsl:call-template name="memberli" />
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-            <xsl:if test="//pdx:member[@visibility='public']">
-                <h4>public</h4>
-                <ul class="members">
-                    <xsl:for-each select="//pdx:member[@visibility='public']">
-                        <xsl:sort select="@name" />
-                        <xsl:call-template name="memberli" />
-                    </xsl:for-each>
-                </ul>
-            </xsl:if>
-        </div>
+        <xsl:if test="//pdx:member[@visibility='private']">
+            #### private
+            <xsl:for-each select="//pdx:member[@visibility='private']">
+                <xsl:sort select="@name" />
+                <xsl:call-template name="memberli" />
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="//pdx:member[@visibility='protected']">
+            #### protected
+            <xsl:for-each select="//pdx:member[@visibility='protected']">
+                <xsl:sort select="@name" />
+                <xsl:call-template name="memberli" />
+            </xsl:for-each>
+        </xsl:if>
+        <xsl:if test="//pdx:member[@visibility='public']">
+            #### public
+            <xsl:for-each select="//pdx:member[@visibility='public']">
+                <xsl:sort select="@name" />
+                <xsl:call-template name="memberli" />
+            </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
 
     <xsl:template name="memberli">
-        <li id="{@name}">
-            <strong>$<xsl:value-of select="@name" /></strong>
-            <xsl:if test="pdx:docblock/pdx:var">
-                —
-                <xsl:choose>
-                    <xsl:when test="pdx:docblock/pdx:var/@type = 'object'">
-                        <a href="#"><xsl:value-of select="pdx:docblock/pdx:var/pdx:type/@full" /></a>
-                    </xsl:when>
-                    <xsl:otherwise><xsl:value-of select="pdx:docblock/pdx:var/@type" /></xsl:otherwise>
-                </xsl:choose>
-            </xsl:if>
-            <xsl:if test="pdx:docblock/pdx:description/@compact != ''">
-                <br/>
-                <span class="indent">
-                    <xsl:value-of select="pdx:docblock/pdx:description/@compact" />
-                </span>
-            </xsl:if>
-        </li>
+        * <a name="{@name}"></a>**$<xsl:value-of select="@name" />**
+        <xsl:if test="pdx:docblock/pdx:var">
+            —
+            <xsl:choose>
+                <xsl:when test="pdx:docblock/pdx:var/@type = 'object'">
+                    <a href="#"><xsl:value-of select="pdx:docblock/pdx:var/pdx:type/@full" /></a>
+                </xsl:when>
+                <xsl:otherwise><xsl:value-of select="pdx:docblock/pdx:var/@type" /></xsl:otherwise>
+            </xsl:choose>
+        </xsl:if>
+        <xsl:if test="pdx:docblock/pdx:description/@compact != ''"><xsl:value-of select="pdx:docblock/pdx:description/@compact" /></xsl:if>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
 
     <xsl:template name="methods">
-        <div class="styled">
-            <xsl:if test="$unit/pdx:method[@visibility='private']">
-                <h4>private</h4>
-                <xsl:call-template name="method-ul">
-                    <xsl:with-param name="isParent" select="'false'" />
-                    <xsl:with-param name="visibility" select="'private'" />
-                    <xsl:with-param name="ctx" select="$unit" />
-                </xsl:call-template>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:method[@visibility='protected']">
-                <h4>protected</h4>
-                <xsl:call-template name="method-ul">
-                    <xsl:with-param name="isParent" select="'false'" />
-                    <xsl:with-param name="visibility" select="'protected'" />
-                    <xsl:with-param name="ctx" select="$unit" />
-                </xsl:call-template>
-            </xsl:if>
-            <xsl:if test="$unit/pdx:method[@visibility='public']">
-                <h4>public</h4>
-                <xsl:call-template name="method-ul">
-                    <xsl:with-param name="isParent" select="'false'" />
-                    <xsl:with-param name="visibility" select="'public'" />
-                    <xsl:with-param name="ctx" select="$unit" />
-                </xsl:call-template>
-            </xsl:if>
-            <xsl:call-template name="inheritedMethods">
+        <xsl:if test="$unit/pdx:method[@visibility='private']">
+            #### private
+            <xsl:call-template name="method-ul">
+                <xsl:with-param name="isParent" select="'false'" />
+                <xsl:with-param name="visibility" select="'private'" />
                 <xsl:with-param name="ctx" select="$unit" />
             </xsl:call-template>
-
-        </div>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:method[@visibility='protected']">
+            #### protected
+            <xsl:call-template name="method-ul">
+                <xsl:with-param name="isParent" select="'false'" />
+                <xsl:with-param name="visibility" select="'protected'" />
+                <xsl:with-param name="ctx" select="$unit" />
+            </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="$unit/pdx:method[@visibility='public']">
+            #### public
+            <xsl:call-template name="method-ul">
+                <xsl:with-param name="isParent" select="'false'" />
+                <xsl:with-param name="visibility" select="'public'" />
+                <xsl:with-param name="ctx" select="$unit" />
+            </xsl:call-template>
+        </xsl:if>
+        <xsl:call-template name="inheritedMethods">
+            <xsl:with-param name="ctx" select="$unit" />
+        </xsl:call-template>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
@@ -311,28 +227,25 @@
         <xsl:param name="visibility" />
         <xsl:param name="ctx" />
         <xsl:param name="isParent" select="'true'" />
-        <ul>
-            <xsl:if test="$isParent != 'true'">
-                <xsl:for-each select="$unit/pdx:constructor[@visibility = $visibility]|$unit/pdx:destructor[@visibility = $visibility]">
-                    <xsl:call-template name="method-li" />
-                </xsl:for-each>
-            </xsl:if>
-            <xsl:for-each select="$ctx/pdx:method[@visibility=$visibility]">
-                <xsl:sort select="@name" />
+        <xsl:if test="$isParent != 'true'">
+            <xsl:for-each select="$unit/pdx:constructor[@visibility = $visibility]|$unit/pdx:destructor[@visibility = $visibility]">
                 <xsl:call-template name="method-li" />
             </xsl:for-each>
-        </ul>
+        </xsl:if>
+        <xsl:for-each select="$ctx/pdx:method[@visibility=$visibility]">
+            <xsl:sort select="@name" />
+            <xsl:call-template name="method-li" />
+        </xsl:for-each>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
 
     <xsl:template name="method-li">
-        <li id="{@name}">
-            <xsl:copy-of select="pdxf:link(parent::*[1], @name, concat(@name, '()'))" />
-            <xsl:if test="pdx:docblock/pdx:description/@compact != ''">
-                — <xsl:value-of select="pdx:docblock/pdx:description/@compact" />
-            </xsl:if>
-        </li>
+        * <a name="{@name}"></a>
+        <xsl:copy-of select="pdxf:link(parent::*[1], @name, concat(@name, '()'))" />
+        <xsl:if test="pdx:docblock/pdx:description/@compact != ''">
+            — <xsl:value-of select="pdx:docblock/pdx:description/@compact" />
+        </xsl:if>
     </xsl:template>
 
     <!-- ######################################################################################################### -->
@@ -344,31 +257,27 @@
             <xsl:variable name="parent" select="." />
 
             <xsl:if test="count($parent/pdx:method) > 0">
-                <h3>Inherited from <xsl:copy-of select="pdxf:link($parent, '', $parent/@full)" /></h3>
+                ### Inherited from <xsl:copy-of select="pdxf:link($parent, '', $parent/@full)" />
             </xsl:if>
             <xsl:if test="$parent/pdx:method[@visibility='protected']">
-                <h4>protected</h4>
-                <ul>
-                    <xsl:for-each select="$parent/pdx:method[@visibility='protected']">
-                        <xsl:sort select="@name" />
-                        <xsl:variable name="name" select="@name" />
-                        <xsl:if test="not($unit/pdx:mehthod[@name = $name])">
-                            <xsl:call-template name="method-li" />
-                        </xsl:if>
-                    </xsl:for-each>
-                </ul>
+                #### protected
+                <xsl:for-each select="$parent/pdx:method[@visibility='protected']">
+                    <xsl:sort select="@name" />
+                    <xsl:variable name="name" select="@name" />
+                    <xsl:if test="not($unit/pdx:mehthod[@name = $name])">
+                        <xsl:call-template name="method-li" />
+                    </xsl:if>
+                </xsl:for-each>
             </xsl:if>
             <xsl:if test="$parent/pdx:method[@visibility='public']">
-                <h4>public</h4>
-                <ul>
-                    <xsl:for-each select="$parent/pdx:method[@visibility='public']">
-                        <xsl:sort select="@name" />
-                        <xsl:variable name="name" select="@name" />
-                        <xsl:if test="not($unit/pdx:mehthod[@name = $name])">
-                            <xsl:call-template name="method-li" />
-                        </xsl:if>
-                    </xsl:for-each>
-                </ul>
+                #### public
+                <xsl:for-each select="$parent/pdx:method[@visibility='public']">
+                    <xsl:sort select="@name" />
+                    <xsl:variable name="name" select="@name" />
+                    <xsl:if test="not($unit/pdx:mehthod[@name = $name])">
+                        <xsl:call-template name="method-li" />
+                    </xsl:if>
+                </xsl:for-each>
             </xsl:if>
         </xsl:for-each>
     </xsl:template>
@@ -387,21 +296,14 @@
     <!-- ######################################################################################################### -->
 
     <xsl:template name="git-history">
-        <ul class="styled history">
         <xsl:for-each select="//pdx:enrichment[@type = 'git']/git:commit">
             <xsl:sort data-type="number" select="git:commiter/@unixtime" order="descending" />
-            <li>
-                <h3><xsl:value-of select="git:commiter/@time" /> (commit #<span title="{@sha1}"><xsl:value-of select="substring(@sha1,0,8)" /></span>)</h3>
-                <div>
-                    <p>
-                        Author: <xsl:value-of select="git:author/@name" /> (<xsl:value-of select="git:author/@email" />) /
-                        Commiter: <xsl:value-of select="git:commiter/@name" /> (<xsl:value-of select="git:author/@email" />)
-                    </p>
-                    <pre class="wrapped"><xsl:value-of select="git:message" /></pre>
-                </div>
-            </li>
+            ### <xsl:value-of select="git:commiter/@time" /> (commit #<xsl:value-of select="substring(@sha1,0,8)" />)
+
+            Author: <xsl:value-of select="git:author/@name" /> (<xsl:value-of select="git:author/@email" />) /
+            Committer: <xsl:value-of select="git:commiter/@name" /> (<xsl:value-of select="git:author/@email" />)
+            `<xsl:value-of select="git:message" />`
         </xsl:for-each>
-        </ul>
     </xsl:template>
 
 </xsl:stylesheet>

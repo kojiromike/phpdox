@@ -36,7 +36,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <func:result><a title="{$ctx/@full}" href="{$link}"><xsl:value-of select="$text" /></a></func:result>
+        <func:result>[<xsl:value-of select="$text" />]({$link} "{$ctx/@full}")</func:result>
     </func:function>
 
     <func:function name="pdxf:nl2br">
@@ -45,7 +45,7 @@
             <xsl:value-of select="normalize-space(substring-before($string,'&#10;'))"/>
             <xsl:choose>
                 <xsl:when test="contains($string,'&#10;')">
-                    <br />
+
                     <xsl:copy-of select="pdxf:nl2br(substring-after($string,'&#10;'))" />
                 </xsl:when>
                 <xsl:otherwise>

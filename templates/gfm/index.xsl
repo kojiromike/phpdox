@@ -50,9 +50,7 @@
     </xsl:template>
 
     <xsl:template name="missing">
-        <div class="unavailable">
-            <p><strong>Warning:</strong> PHPLoc enrichment not enabled or phploc.xml not found.</p>
-        </div>
+        **Warning:** PHPLoc enrichment not enabled or phploc.xml not found.
         <xsl:call-template name="phploc" />
     </xsl:template>
 
